@@ -1,0 +1,38 @@
+services:
+  daq:
+    container_name: daq
+    image: gmazzitelli/daq:1.0
+    ports:
+      - 8888:8888
+
+    user: root                
+    working_dir: /home/jovyan/work
+    privileged: true
+
+    environment:
+      - GRANT_SUDO=yes
+
+    volumes:
+      - /Volumes/WC:/home/jovyan/work/data
+      - "/Users/mazzitel/Google Drive/My Drive/DAQ:/home/jovyan/work"
+#      - daq:/cvmfs 
+      - /Volumes/cvmfs:/cvmfs:ro
+    stdin_open: true  
+    tty: true 
+
+  cvmfs:
+    image: registry.cern.ch/cvmfs/service
+    restart: unless-stopped
+    container_name: cvmfs
+    environment: 
+      CVMFS_CLIENT_PROFILE: 'single'
+      CVMFS_REPOSITORIES: 'sft.cern.ch'
+    privileged: true
+    devices:
+       - /dev/fuse
+    volumes:
+#       - daq:/cvmfs
+        - /Volumes/cvmfs:/cvmfs:shared
+#volumes:
+#  daq:
+#    driver: local
