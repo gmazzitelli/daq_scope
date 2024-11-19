@@ -11,14 +11,15 @@ services:
 
     environment:
       - GRANT_SUDO=yes
-
+      - REPO_LIST=sft.cern.ch
     volumes:
       - /Volumes/WC:/home/jovyan/work/data
       - "$PWD/../:/home/jovyan/work"
       - daq:/cvmfs 
-#      - /Volumes/cvmfs:/cvmfs:ro
+#      - ./mount_cvmfs.sh:/usr/bin/mount_cvmfs.sh
     stdin_open: true  
     tty: true 
+#    command: [tini -g -- start-notebook.py && exec sudo /usr/bin/mount_cvmfs.sh]
 
   cvmfs:
     image: registry.cern.ch/cvmfs/service
@@ -32,7 +33,6 @@ services:
        - /dev/fuse
     volumes:
        - daq:/cvmfs
-#        - /Volumes/cvmfs:/cvmfs:shared
 volumes:
   daq:
     driver: local
