@@ -16,11 +16,10 @@ services:
       - /Volumes/WC:/home/jovyan/work/data
       - "$PWD/../:/home/jovyan/work"
       - daq:/cvmfs 
-#      - ./mount_cvmfs.sh:/usr/bin/mount_cvmfs.sh
     stdin_open: true  
     tty: true 
-#    command: [tini -g -- start-notebook.py && exec sudo /usr/bin/mount_cvmfs.sh]
-
+    #command: bash -c "/mount_cvmfs.sh & start-notebook.sh --NotebookApp.token=''"
+    command: bash -c "/mount_cvmfs.sh & tini -g -- start-notebook.py"
   cvmfs:
     image: registry.cern.ch/cvmfs/service
     restart: unless-stopped
