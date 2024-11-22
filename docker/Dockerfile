@@ -1,7 +1,7 @@
 FROM jupyter/minimal-notebook
 
 RUN pip install --no-cache-dir -U \
-    numpy pyvisa pandas h5py gspread matplotlib pymemcache \
+    numpy pyvisa pyvisa_py pandas h5py gspread matplotlib pymemcache seaborn \
     git+https://github.com/SengerM/TeledyneLeCroyPy
 
 USER root
@@ -19,7 +19,4 @@ RUN echo "user_allow_other" >> /etc/fuse.conf \
 
 COPY mount_cvmfs.sh /mount_cvmfs.sh
 RUN chmod +x /mount_cvmfs.sh
-# ENTRYPOINT ["/bin/sh", "-c" , "/mount_cvmfs.sh && /tmp/"]
-# ENTRYPOINT [ "/mount_cvmfs.sh" ]
-# tini -g -- start-notebook.py && exec sudo /usr/bin/mount_cvmfs.sh
-# RUN echo "PS1='DAQ_SCOPE:\w> '" >> /etc/bash.bashrc 
+RUN echo "PS1='DAQ_SCOPE:\w> '" >> /home/jovyan/.bashrc 

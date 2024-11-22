@@ -23,6 +23,9 @@ from google.oauth2 import service_account
 import json
 import subprocess
 import sys
+import socks
+import socket
+
 
 def append_record_to_hdf5(filename, record_id, record_data):
     with h5py.File(filename, 'a') as hdf_file:
@@ -64,6 +67,10 @@ class NumpyEncoder(json.JSONEncoder):
 
 def main(ip, port, path, upload, pkl, verbose):
     
+    # Configura il proxy SOCKS
+    socks.set_default_proxy(socks.SOCKS5, "localhost", 1080)
+    socket.socket = socks.socksocket
+    
     credentials = service_account.Credentials.from_service_account_file('../.google_credentials.json')
     scope = ['https://spreadsheets.google.com/feeds']
     creds_scope = credentials.with_scopes(scope)
@@ -79,10 +86,10 @@ def main(ip, port, path, upload, pkl, verbose):
 
 
     start = time.time()
+    if verbose: print('TCPIP0::{:s}::inst0::INSTR'.format(ip))
     while True:
         try:
             o = TeledyneLeCroyPy.LeCroyWaveRunner('TCPIP0::{:s}::inst0::INSTR'.format(ip)) 
-            #o = TeledyneLeCroyPy.LeCroyWaveRunner('TCPIP0::{:s}::{:d}::SOCKET'.format(ip, port))
             break
         except:
             time.sleep(0.1)
@@ -239,15 +246,14 @@ if __name__ == "__main__":
     # 192.168.201.7 CYGNO
     #
     IP         = 'spaip.lnf.infn.it'
-#    IP         = '192.168.140.211' 
-
-    PATH       = '/Volumes/WC/generic/'
+    IP         = '192.168.140.211' # ip lnf
+    PATH       = '../data/generic/'
     PORT       = 111
 
     parser = OptionParser(usage='usage: %prog -i -p\n')
     parser.add_option('-i','--ip', dest='ip', type='string', default=IP, help='ip [{:s}]'.format(IP))
     parser.add_option('-p','--port', dest='port', type='int', default=PORT, help='port [{:d}]'.format(PORT))
-    parser.add_option('-d','--path', dest='path', type='string', default=IP, help='destination path [{:s}]'.format(PATH))
+    parser.add_option('-d','--path', dest='path', type='string', default=PATH, help='destination path [{:s}]'.format(PATH))
     parser.add_option('-u','--upload', dest='upload', action="store_true", default=False, help='upload file in cloud?')
     parser.add_option('-f','--pkl', dest='pkl', action="store_true", default=False, help='pkl format insted of h5?')
     parser.add_option('-v','--verbose', dest='verbose', action="store_true", default=False, help='verbose output')

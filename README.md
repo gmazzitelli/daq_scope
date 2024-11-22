@@ -1,11 +1,15 @@
-daq contaner
-```docker run -it -p 8888:8888 --name editor --user root -w /home/jovyan/work -v /Users/mazzitel/Google\ Drive/My\ Drive/DAQ:/home/jovyan/work gmazzitelli/daq:1.0```
+script per acquisizione dei dati dell'oscilloscopio lecroy wave surfer
+```./daq.py -h
+Usage: daq.py -i -p
 
-```docker run -it -p 8888:8888 --name editor --user root -w /home/jovyan/work -v /Volumes/WC/:/home/jovyan/work/data -v /Users/mazzitel/Google\ Drive/My\ Drive/DAQ:/home/jovyan/work gmazzitelli/daq:1.0```
-
-
-tips:
-
-```docker build -t gmazzitelli/daq:1.0 .```
-```docker login -u gmazzitelli```
-```docker push gmazzitelli/daq:1.0```
+Options:
+  -h, --help            show this help message and exit
+  -i IP, --ip=IP        ip [192.168.140.211]
+  -p PORT, --port=PORT  port [111]
+  -d PATH, --path=PATH  destination path [../data/generic/]
+  -u, --upload          upload file in cloud?
+  -f, --pkl             pkl format insted of h5?
+  -v, --verbose         verbose output```
+  
+```cd DAQ```
+```./day.py -i <192.168.140.211> -d <../data/generic/>
