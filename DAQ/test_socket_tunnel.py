@@ -3,7 +3,8 @@ import socks
 import socket
 
 # Configura il proxy SOCKS
-socks.set_default_proxy(socks.SOCKS5, "localhost", 1080)
+# "ssh-socks-proxy" e' il nomedel container, altrimenti dovresti usare localhost
+socks.set_default_proxy(socks.SOCKS5, "ssh-socks-proxy", 1080)
 socket.socket = socks.socksocket
 
 # Crea un ResourceManager

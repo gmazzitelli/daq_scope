@@ -4,11 +4,9 @@ services:
     image: gmazzitelli/daq:1.0
     ports:
       - 8888:8888
-
     user: root                
     working_dir: /home/jovyan/work
     privileged: true
-
     environment:
       - GRANT_SUDO=yes
       - REPO_LIST=sft.cern.ch
@@ -16,10 +14,12 @@ services:
       - /Volumes/WC:/home/jovyan/work/data
       - "$PWD/../:/home/jovyan/work"
       - daq:/cvmfs 
+    networks:
+      - internal_network
     stdin_open: true  
     tty: true 
-    #command: bash -c "/mount_cvmfs.sh & start-notebook.sh --NotebookApp.token=''"
     command: bash -c "/mount_cvmfs.sh & tini -g -- start-notebook.py"
+
   cvmfs:
     image: registry.cern.ch/cvmfs/service
     restart: unless-stopped
@@ -29,9 +29,40 @@ services:
       CVMFS_REPOSITORIES: 'sft.cern.ch'
     privileged: true
     devices:
-       - /dev/fuse
+      - /dev/fuse
     volumes:
-       - daq:/cvmfs
+      - daq:/cvmfs
+    networks:
+      - internal_network
+
+  ssh-socks-proxy:
+    image: ssh-socks-proxy
+    container_name: ssh-socks-proxy
+    volumes:
+      - "$PWD/../.ssh/spaip_rsa:/root/.ssh/id_rsa"
+    networks:
+      - internal_network
+    entrypoint: ["/entrypoint.sh"]
+
+  tokener:
+    image: gmazzitelli/tokener:v0.2
+    container_name: tokener
+    environment:
+      REFRESH_TOKEN: ${REFRESH_TOKEN}
+      IAM_CLIENT_SECRET: ${IAM_CLIENT_SECRET}
+      IAM_CLIENT_ID: ${IAM_CLIENT_ID}
+      IAM_TOKEN_ENDPOINT: ${IAM_TOKEN_ENDPOINT}
+      SCOPES: ${SCOPES}
+      TOKEN_FILE: /tmp/.token
+    volumes:
+      - "$PWD/../.token:/tmp/.token"
+    networks:
+      - internal_network
+
+networks:
+  internal_network:
+    driver: bridge
+
 volumes:
   daq:
     driver: local

@@ -66,11 +66,14 @@ class NumpyEncoder(json.JSONEncoder):
 
 
 def main(ip, port, path, upload, pkl, verbose):
-    
-    # Configura il proxy SOCKS
-    socks.set_default_proxy(socks.SOCKS5, "localhost", 1080)
+    #
+    # Configura il proxy SOCKS che apre una VPN con il router di CYGNO
+    # "ssh-socks-proxy" e' il nomedel container, altrimenti dovresti usare localhost, 
+    # anche la porta 1080 e' fissata dal docker.
+    #
+    socks.set_default_proxy(socks.SOCKS5, "ssh-socks-proxy", 1080)
     socket.socket = socks.socksocket
-    
+    #############################################
     credentials = service_account.Credentials.from_service_account_file('../.google_credentials.json')
     scope = ['https://spreadsheets.google.com/feeds']
     creds_scope = credentials.with_scopes(scope)
