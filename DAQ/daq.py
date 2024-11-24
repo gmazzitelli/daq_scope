@@ -65,16 +65,18 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def main(ip, port, path, upload, pkl, verbose):
+def main(ip, enable_socket, path, enable_upload, enable_pkl, verbose):
     #
     # Configura il proxy SOCKS che apre una VPN con il router di CYGNO
     # "ssh-socks-proxy" e' il nomedel container, altrimenti dovresti usare localhost, 
     # anche la porta 1080 e' fissata dal docker.
     #
-    socks.set_default_proxy(socks.SOCKS5, "ssh-socks-proxy", 1080)
-    socket.socket = socks.socksocket
+    if enable_socket:
+        socks.set_default_proxy(socks.SOCKS5, "ssh-socks-proxy", 1080)
+        socket.socket = socks.socksocket
+
     #############################################
-    credentials = service_account.Credentials.from_service_account_file('../.google_credentials.json')
+    credentials = service_account.Credentials.from_service_account_file('../.ssh/.google_credentials.json')
     scope = ['https://spreadsheets.google.com/feeds']
     creds_scope = credentials.with_scopes(scope)
     client = gspread.authorize(creds_scope)
@@ -95,17 +97,21 @@ def main(ip, port, path, upload, pkl, verbose):
             o = TeledyneLeCroyPy.LeCroyWaveRunner('TCPIP0::{:s}::inst0::INSTR'.format(ip)) 
             break
         except:
-            time.sleep(0.1)
-            end = time.time()
-            print("waiting for connection... "+str(int(end-start))+"s", end="\r")
             pass
-    print("Connected", o.idn) # Prings e.g. LECROY,WAVERUNNER9254M,LCRY4751N40408,9.2.0
+        end = time.time()
+        if int(end-start)>=10:
+            print("ERROR connection timeout")
+            sys.exit(1)
+        else:
+            time.sleep(0.5)
+            print("waiting for connection... "+str(int(end-start))+"/10 s", end="\r")
+
+    print("Connected", o.idn) # Print e.g. LECROY,WAVERUNNER9254M,LCRY4751N40408,9.2.0
 
     # end to init connection
 
     EVENTS= 1000
     DSHOW = False
-    FTYPE = 'PKL'
     CHANNELS = 4
 
 
@@ -136,16 +142,7 @@ def main(ip, port, path, upload, pkl, verbose):
             else:
                 events=EVENTS
 
-    #         user_input = input("file type: [{}] ".format(FTYPE)).lower()
-    #         if user_input:
-    #             pkl = False
-    #         else:
-    #             pkl = True
-
-            # pkl=False
-
-
-            if pkl:
+            if enable_pkl:
                 filename = "run_{:05d}.pkl".format(run)
             else:
                 filename = "run_{:05d}.h5".format(run)
@@ -183,7 +180,7 @@ def main(ip, port, path, upload, pkl, verbose):
                     dt1 = time.time()
                     for channel in range(1, channels+1):
                         data = o.get_waveform(n_channel=channel)
-                        if pkl:
+                        if enable_pkl:
                             triggers.append(data)
                         else:
                             dict2save['H'+str(channel)]=json.dumps(data['wavedesc'], default=str)
@@ -196,7 +193,7 @@ def main(ip, port, path, upload, pkl, verbose):
                             plt.plot(x,y, label="C"+str(n_channel))
 
 
-                    if pkl:
+                    if eanable_pkl:
                         append_record_to_pickle(filepath, triggers)
                     else:
                         dict2save['epoch']=data['wavedesc']['TRIGGER_TIME'].timestamp()
@@ -220,7 +217,7 @@ def main(ip, port, path, upload, pkl, verbose):
             end_epoch = time.time()
             logdf.at[run, 'end_epoch']=end_epoch
             logdf.at[run, 'events']=event+1
-            if upload:
+            if enable_upload:
                 print ("Uploding file on cloud in background...")
                 subprocess.Popen(['./uploadFile.py', '-g', '-r', filepath], stdout=None, stderr=None, stdin=None)
 
@@ -255,7 +252,7 @@ if __name__ == "__main__":
 
     parser = OptionParser(usage='usage: %prog -i -p\n')
     parser.add_option('-i','--ip', dest='ip', type='string', default=IP, help='ip [{:s}]'.format(IP))
-    parser.add_option('-p','--port', dest='port', type='int', default=PORT, help='port [{:d}]'.format(PORT))
+    parser.add_option('-s','--socket', dest='socket', action="store_true", default=False, help='enable socket passthrough')
     parser.add_option('-d','--path', dest='path', type='string', default=PATH, help='destination path [{:s}]'.format(PATH))
     parser.add_option('-u','--upload', dest='upload', action="store_true", default=False, help='upload file in cloud?')
     parser.add_option('-f','--pkl', dest='pkl', action="store_true", default=False, help='pkl format insted of h5?')
@@ -268,4 +265,4 @@ if __name__ == "__main__":
 #         parser.error("missing key/folder to beckup, example {:s}".format(KEY))
 #         sys.exit(1)
      
-    main(options.ip, options.port, options.path, options.upload, options.pkl, options.verbose)
+    main(options.ip,  options.socket, options.path, options.upload, options.pkl, options.verbose)
