@@ -1,7 +1,7 @@
 FROM jupyter/minimal-notebook
 
 RUN pip install --no-cache-dir -U \
-    numpy pyvisa pyvisa_py pandas h5py gspread matplotlib pymemcache seaborn \
+    numpy pyvisa pyvisa_py pandas h5py gspread matplotlib pymemcache seaborn boto3 \
     git+https://github.com/SengerM/TeledyneLeCroyPy
 
 USER root

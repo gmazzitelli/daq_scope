@@ -89,7 +89,7 @@ def main(ip, enable_socket, path, enable_upload, enable_pkl, verbose):
     # https://docs.google.com/spreadsheets/d/1idBnsYG4pHdHZ2kDbq-S3PBUAf0ewFEzKXOtCTGDxyU
     #
 
-
+    print("OK: connentcig to ", ip)
     start = time.time()
     if verbose: print('TCPIP0::{:s}::inst0::INSTR'.format(ip))
     while True:
@@ -100,14 +100,14 @@ def main(ip, enable_socket, path, enable_upload, enable_pkl, verbose):
             pass
         end = time.time()
         if int(end-start)>=10:
-            print("ERROR connection timeout")
+            print("ERROR: connection timeout")
             sys.exit(1)
         else:
             time.sleep(0.5)
-            print("waiting for connection... "+str(int(end-start))+"/10 s", end="\r")
+            print("--> waiting for connection... "+str(int(end-start))+"/10 s", end="\r")
 
-    print("Connected", o.idn) # Print e.g. LECROY,WAVERUNNER9254M,LCRY4751N40408,9.2.0
-
+    print("OK: connected", o.idn) # Print e.g. LECROY,WAVERUNNER9254M,LCRY4751N40408,9.2.0
+    print("OK: data path:", path)
     # end to init connection
 
     EVENTS= 1000
@@ -193,7 +193,7 @@ def main(ip, enable_socket, path, enable_upload, enable_pkl, verbose):
                             plt.plot(x,y, label="C"+str(n_channel))
 
 
-                    if eanable_pkl:
+                    if enable_pkl:
                         append_record_to_pickle(filepath, triggers)
                     else:
                         dict2save['epoch']=data['wavedesc']['TRIGGER_TIME'].timestamp()
@@ -219,7 +219,12 @@ def main(ip, enable_socket, path, enable_upload, enable_pkl, verbose):
             logdf.at[run, 'events']=event+1
             if enable_upload:
                 print ("Uploding file on cloud in background...")
-                subprocess.Popen(['./uploadFile.py', '-g', '-r', filepath], stdout=None, stderr=None, stdin=None)
+                if path.split('/')[-1] == '':
+                    ftag = 'SCOPE/'+path.split('/')[-2]
+                else:
+                    ftag = 'SCOPE/'+path.split('/')[-1]
+                # ./uploadFile.py -b cygno-analysis -t WC/generic -g /home/jovyan/work/data/generic/run_00001.h5
+                subprocess.Popen(['./uploadFile.py', '-b', 'cygno-analysis', '-t', ftag, '-g', '-r', filepath], stdout=None, stderr=None, stdin=None)
 
             user_input = input("Enter closing remarks? (if any) ")
             if user_input:
@@ -245,17 +250,15 @@ if __name__ == "__main__":
     # 192.168.189.115 BTF
     # 192.168.201.7 CYGNO
     #
-    IP         = 'spaip.lnf.infn.it'
     IP         = '192.168.140.211' # ip lnf
-    PATH       = '../data/generic/'
-    PORT       = 111
+    PATH       = '/home/jovyan/work/data/generic/'
 
     parser = OptionParser(usage='usage: %prog -i -p\n')
     parser.add_option('-i','--ip', dest='ip', type='string', default=IP, help='ip [{:s}]'.format(IP))
     parser.add_option('-s','--socket', dest='socket', action="store_true", default=False, help='enable socket passthrough')
     parser.add_option('-d','--path', dest='path', type='string', default=PATH, help='destination path [{:s}]'.format(PATH))
     parser.add_option('-u','--upload', dest='upload', action="store_true", default=False, help='upload file in cloud?')
-    parser.add_option('-f','--pkl', dest='pkl', action="store_true", default=False, help='pkl format insted of h5?')
+    parser.add_option('-p','--pkl', dest='pkl', action="store_true", default=False, help='pkl format insted of h5?')
     parser.add_option('-v','--verbose', dest='verbose', action="store_true", default=False, help='verbose output')
     (options, args) = parser.parse_args()
     if options.verbose: 

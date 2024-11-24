@@ -166,7 +166,6 @@ cython_debug/
 .DS_Store
 .google_credentials.json
 .env
-VPN_DAQ_2018-01-03-00-36-04.ovpn
-./data
-./.ssh/
+.data/
+.ssh/
 .token

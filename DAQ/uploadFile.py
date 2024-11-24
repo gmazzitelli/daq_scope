@@ -56,7 +56,7 @@ def main(filename, bucket, tag, remove, gzip, verbose):
         filename = filename+'.gz'
             
     upload_file_2_S3(filename, os.environ['IAM_CLIENT_ID'], os.environ['IAM_CLIENT_SECRET'],  
-                 'https://minio.cloud.infn.it/', bucket, tag, '/tmp/token', verbose=verbose)
+                 'https://minio.cloud.infn.it/', bucket, tag, '../.token', verbose=verbose)
     if remove:
         os.remove(f2remove)
     

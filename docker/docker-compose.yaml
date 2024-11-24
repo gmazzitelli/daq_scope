@@ -8,8 +8,11 @@ services:
     working_dir: /home/jovyan/work
     privileged: true
     environment:
-      - GRANT_SUDO=yes
-      - REPO_LIST=sft.cern.ch
+      GRANT_SUDO: 'yes'
+      REPO_LIST: 'sft.cern.ch'
+      IAM_CLIENT_SECRET: ${IAM_CLIENT_SECRET}
+      IAM_CLIENT_ID: ${IAM_CLIENT_ID}
+      IAM_TOKEN_ENDPOINT: ${IAM_TOKEN_ENDPOINT}
     volumes:
       - /Volumes/WC:/home/jovyan/work/data
       - "$PWD/../:/home/jovyan/work"
@@ -53,9 +56,9 @@ services:
       IAM_CLIENT_ID: ${IAM_CLIENT_ID}
       IAM_TOKEN_ENDPOINT: ${IAM_TOKEN_ENDPOINT}
       SCOPES: ${SCOPES}
-      TOKEN_FILE: /tmp/.token
+      TOKEN_FILE: '/tmp/token'
     volumes:
-      - "$PWD/../.token:/tmp/.token"
+      - "$PWD/../.token:/tmp/token"
     networks:
       - internal_network
 

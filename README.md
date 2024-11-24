@@ -14,7 +14,7 @@ Options:
   -s, --socket          enable socket passthrough
   -d PATH, --path=PATH  destination path [/home/jovyan/work/data/generic/]
   -u, --upload          upload file in cloud?
-  -f, --pkl             pkl format insted of h5?
+  -p, --pkl             pkl format insted of h5?
   -v, --verbose         verbose output  
 ```
 * di default c'e' il numero ip dei LNF, che implica che l'oscilloscopio sia collegato alla rete LNF. altrimenti si puo' accededere all'intranet di CYGNO con l'opsione -s
@@ -25,4 +25,10 @@ Options:
   
 ```./day.py -i 192.168.140.211 -d /home/jovyan/work/data/generic/```
 
-```./day.py -i 192.168.1.189 -s -d /home/jovyan/work/data/WC/```
+per il daq di WC
+
+```./daq.py -i 192.168.1.198 -s -d /home/jovyan/work/data/WC/ -u ```
+
+logbook
+* gerinc logbook https://docs.google.com/spreadsheets/d/1wtI7ybfk2HGaOFxNc5mXymqL0aU2aS8bSHa990xifeQ/
+* WC logbook https://docs.google.com/spreadsheets/d/1idBnsYG4pHdHZ2kDbq-S3PBUAf0ewFEzKXOtCTGDxyU/
