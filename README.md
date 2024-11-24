@@ -30,5 +30,5 @@ per il daq di WC
 ```./daq.py -i 192.168.1.198 -s -d /home/jovyan/work/data/WC/ -u ```
 
 logbook
-* gerinc logbook https://docs.google.com/spreadsheets/d/1wtI7ybfk2HGaOFxNc5mXymqL0aU2aS8bSHa990xifeQ/
+* general logbook https://docs.google.com/spreadsheets/d/1wtI7ybfk2HGaOFxNc5mXymqL0aU2aS8bSHa990xifeQ/
 * WC logbook https://docs.google.com/spreadsheets/d/1idBnsYG4pHdHZ2kDbq-S3PBUAf0ewFEzKXOtCTGDxyU/
