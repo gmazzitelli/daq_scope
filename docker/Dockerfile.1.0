@@ -17,12 +17,6 @@ RUN apt-get autoremove -y && apt-get clean
 RUN echo "user_allow_other" >> /etc/fuse.conf \
     && echo -e "\nCVMFS_HTTP_PROXY=DIRECT\n" >> /etc/cvmfs/default.conf
 
-COPY ./contents/common.infn.it.pub /etc/cvmfs/keys/infn.it/common.infn.it.pub
-COPY ./contents/default.local /etc/cvmfs/default.local
-COPY ./contents/infn.it.conf /etc/cvmfs/domain.d/infn.it.conf
-
-COPY ./contents/startup.sh /opt/startup.sh
-
-ENTRYPOINT ["/opt/startup.sh"]
-
+COPY mount_cvmfs.sh /mount_cvmfs.sh
+RUN chmod +x /mount_cvmfs.sh
 RUN echo "PS1='DAQ_SCOPE:\w> '" >> /home/jovyan/.bashrc 

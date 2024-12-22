@@ -80,8 +80,9 @@ def main(ip, enable_socket, path, enable_upload, enable_pkl, verbose):
     scope = ['https://spreadsheets.google.com/feeds']
     creds_scope = credentials.with_scopes(scope)
     client = gspread.authorize(creds_scope)
-    sheet = client.open_by_key('1wtI7ybfk2HGaOFxNc5mXymqL0aU2aS8bSHa990xifeQ') # generic
+#    sheet = client.open_by_key('1wtI7ybfk2HGaOFxNc5mXymqL0aU2aS8bSHa990xifeQ') # generic
     #sheet = client.open_by_key('1idBnsYG4pHdHZ2kDbq-S3PBUAf0ewFEzKXOtCTGDxyU') # WC
+    sheet = client.open_by_key('1roMYt100KumtgZ7UI0Iz_xmdhjaWCat-tt7ijZCDb4M') #CYGNO
     log = sheet.worksheet("log")
 
     #
@@ -251,7 +252,7 @@ if __name__ == "__main__":
     # 192.168.201.7 CYGNO
     #
     IP         = '192.168.140.211' # ip lnf
-    PATH       = '/home/jovyan/work/data/generic/'
+    PATH       = '/home/jovyan/work/data/cygno/'
 
     parser = OptionParser(usage='usage: %prog -i -p\n')
     parser.add_option('-i','--ip', dest='ip', type='string', default=IP, help='ip [{:s}]'.format(IP))

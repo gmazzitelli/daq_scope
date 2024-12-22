@@ -1,7 +1,7 @@
 services:
   daq:
     container_name: daq
-    image: gmazzitelli/daq:1.1
+    image: gmazzitelli/daq:1.0
     ports:
       - 8888:8888
     user: root                
@@ -9,18 +9,34 @@ services:
     privileged: true
     environment:
       GRANT_SUDO: 'yes'
-      REPO_LIST: 'sft.cern.ch datacloud.infn.it sft-cygno.infn.it'
+      REPO_LIST: 'sft.cern.ch'
       IAM_CLIENT_SECRET: ${IAM_CLIENT_SECRET}
       IAM_CLIENT_ID: ${IAM_CLIENT_ID}
       IAM_TOKEN_ENDPOINT: ${IAM_TOKEN_ENDPOINT}
     volumes:
       - /Volumes/WC:/home/jovyan/work/data
       - "$PWD/../:/home/jovyan/work"
+      - daq:/cvmfs 
     networks:
       - internal_network
     stdin_open: true  
     tty: true 
-    command: bash -c "/opt/startup.sh & tini -g -- start-notebook.py"
+    command: bash -c "/mount_cvmfs.sh & tini -g -- start-notebook.py"
+
+  cvmfs:
+    image: registry.cern.ch/cvmfs/service
+    restart: unless-stopped
+    container_name: cvmfs
+    environment: 
+      CVMFS_CLIENT_PROFILE: 'single'
+      CVMFS_REPOSITORIES: 'sft.cern.ch'
+    privileged: true
+    devices:
+      - /dev/fuse
+    volumes:
+      - daq:/cvmfs
+    networks:
+      - internal_network
 
   ssh-socks-proxy:
     image: ssh-socks-proxy
@@ -50,3 +66,6 @@ networks:
   internal_network:
     driver: bridge
 
+volumes:
+  daq:
+    driver: local
